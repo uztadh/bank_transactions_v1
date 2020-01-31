@@ -7,6 +7,7 @@ const ErrInvalidSender = new Error("Invalid Sender account number");
 const ErrInvalidReceiver = new Error("Invalid Receiver account number");
 const ErrDebounceReq = new Error("Repeated transfer");
 const ErrTestError = new Error("Sample generic error for dev only");
+
 const clientErrors = new Set([
     ErrInsufficientFunds,
     ErrInvalidSender,
@@ -65,8 +66,7 @@ const dbTransfer = async (client, from, to, amount) => {
         };
     } catch (err) {
         await client.query("rollback");
-        if (clientErrors.has(err)) throw err;
-        else throw ErrInternalError;
+        throw err;
     }
 };
 const getCache = (timeoutMs = 1000) => {
@@ -93,19 +93,11 @@ const debounceTx = (cache => (from, to, amount) =>
 
 const handleTransfer = (from, to, amount) => {
     return debounceTx(from, to, amount)
-        .then(() => db.getClient())
-        .catch(err => {
-            //log err, probably connection error or debounce
-            if (err === ErrDebounceReq) throw ErrDebounceReq;
-            throw ErrInternalError;
-        })
+        .then(db.getClient)
         .then(
             client =>
                 new Promise((resolve, reject) => {
-                    client.on("error", err => {
-                        // log err, probably db error during tx session
-                        reject(ErrInternalError);
-                    });
+                    client.on("error", reject);
                     dbTransfer(client, from, to, amount)
                         .then(resolve)
                         .catch(reject)
@@ -120,13 +112,19 @@ const handleTransfer = (from, to, amount) => {
                 transfered: amount
             })
         )
-        .catch(err => Promise.resolve({ error: err.message }));
+        .catch(err => {
+            //log error
+            let errMessage = clientErrors.has(err)
+                ? err.message
+                : ErrInternalError.message;
+            return Promise.resolve({ error: errMessage });
+        });
 };
 
 const main = async () => {
     let res = await Promise.all(
         Array(5)
-            .fill([1, 2, 10])
+            .fill([3, 1, 10])
             .map(args => handleTransfer(...args))
     );
     console.log(res);
