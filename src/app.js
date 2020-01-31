@@ -1,20 +1,14 @@
 const db = require("./db");
 
-const ErrInternalError = new Error("Internal error");
+const clientErr = err => {
+    err.isClientError = true;
+    return err;
+};
 
-const ErrInsufficientFunds = new Error("Insufficient funds");
-const ErrInvalidSender = new Error("Invalid Sender account number");
-const ErrInvalidReceiver = new Error("Invalid Receiver account number");
-const ErrDebounceReq = new Error("Repeated transfer");
-const ErrTestError = new Error("Sample generic error for dev only");
-
-const clientErrors = new Set([
-    ErrInsufficientFunds,
-    ErrInvalidSender,
-    ErrInvalidReceiver,
-    ErrDebounceReq,
-    ErrTestError
-]);
+const ErrInsufficientFunds = clientErr(new Error("Insufficient funds"));
+const ErrInvalidSender = clientErr(new Error("Invalid Sender account nr"));
+const ErrInvalidReceiver = clientErr(new Error("Invalid Receiver account nr"));
+const ErrDebounceReq = clientErr(new Error("Repeated transfer"));
 
 const timer = ms =>
     new Promise(resolve => {
@@ -22,7 +16,12 @@ const timer = ms =>
     });
 
 //either resolves to id of transfer if successful or errors out
-const dbTransfer = async (client, from, to, amount) => {
+const runTransferSQL = ({ from, to, amount }) => async client => {
+    const payload = {
+        from: { id: from },
+        to: { id: to },
+        transfered: amount
+    };
     try {
         await client.query("begin transaction isolation level read committed");
 
@@ -42,6 +41,7 @@ const dbTransfer = async (client, from, to, amount) => {
             returning balance`,
             [amount, from]
         );
+        payload.from.balance = resUpdateSender.rows[0].balance;
 
         //add to receiver's account
         const resUpdateReceiver = await client.query(
@@ -57,13 +57,11 @@ const dbTransfer = async (client, from, to, amount) => {
             values($1, $2) returning reference`,
             [amount, from]
         );
+        payload.id = resInsertTx.rows[0].reference;
 
         //commit
         await client.query("commit");
-        return {
-            id: resInsertTx.rows[0].reference, //tx id for sender
-            balance: resUpdateSender.rows[0].balance //senders balance after transfer
-        };
+        return payload;
     } catch (err) {
         await client.query("rollback");
         throw err;
@@ -71,60 +69,54 @@ const dbTransfer = async (client, from, to, amount) => {
 };
 const getCache = (timeoutMs = 1000) => {
     let set = new Set();
-    const add = key => {
-        set.add(key);
-        setTimeout(() => set.delete(key), timeoutMs);
-    };
-    const has = key => set.has(key);
-    return { add, has };
+    const checkSert = key =>
+        new Promise((resolve, reject) => {
+            if (set.has(key)) return reject(ErrDebounceReq);
+            set.add(key);
+            setTimeout(() => set.delete(key), timeoutMs);
+            resolve();
+        });
+    return { checkSert };
 };
 
 const getTXKey = (from, to, amount) => `${from}!${to}!${amount}`;
 
-const debounceTx = (cache => (from, to, amount) =>
-    new Promise((resolve, reject) => {
-        const txKey = getTXKey(from, to, amount);
-        if (cache.has(txKey)) reject(ErrDebounceReq);
-        else {
-            cache.add(txKey);
-            resolve();
-        }
-    }))(getCache());
+const prTrace = label => val => {
+    console.log(`${label}: ${val}`);
+    return Promise.resolve(val);
+};
 
-const handleTransfer = (from, to, amount) => {
-    return debounceTx(from, to, amount)
+const debounceTx = (cache => ({ from, to, amount }) => {
+    const txKey = getTXKey(from, to, amount);
+    return cache.checkSert(txKey);
+})(getCache());
+
+const handleTxError = err => {
+    //log error
+    let errMessage = err.isClientError ? err.message : "Internal error";
+    return Promise.resolve({ error: errMessage });
+};
+
+const checkClientErrs = runSQL => client =>
+    new Promise((resolve, reject) => {
+        client.on("error", reject);
+        runSQL(client)
+            .then(resolve)
+            .catch(reject)
+            .finally(() => client.release());
+    });
+
+const handleTransfer = details => {
+    return debounceTx(details)
         .then(db.getClient)
-        .then(
-            client =>
-                new Promise((resolve, reject) => {
-                    client.on("error", reject);
-                    dbTransfer(client, from, to, amount)
-                        .then(resolve)
-                        .catch(reject)
-                        .finally(() => client.release());
-                })
-        )
-        .then(({ id, balance }) =>
-            Promise.resolve({
-                id,
-                from: { id: from, balance },
-                to: { id: to },
-                transfered: amount
-            })
-        )
-        .catch(err => {
-            //log error
-            let errMessage = clientErrors.has(err)
-                ? err.message
-                : ErrInternalError.message;
-            return Promise.resolve({ error: errMessage });
-        });
+        .then(checkClientErrs(runTransferSQL(details)))
+        .catch(handleTxError);
 };
 
 const main = async () => {
     let res = await Promise.all(
-        Array(5)
-            .fill([3, 1, 10])
+        Array(3)
+            .fill([{ from: 2, to: 1, amount: 10 }])
             .map(args => handleTransfer(...args))
     );
     console.log(res);
