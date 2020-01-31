@@ -17,6 +17,7 @@ const timer = ms =>
 
 //either resolves to id of transfer if successful or errors out
 const runTransferSQL = ({ from, to, amount }) => async client => {
+    if (from === to) throw ErrInvalidReceiver;
     const payload = {
         from: { id: from },
         to: { id: to },
@@ -116,7 +117,7 @@ const handleTransfer = details => {
 const main = async () => {
     let res = await Promise.all(
         Array(3)
-            .fill([{ from: 2, to: 1, amount: 10 }])
+            .fill([{ from: 1, to: 1, amount: 10 }])
             .map(args => handleTransfer(...args))
     );
     console.log(res);
