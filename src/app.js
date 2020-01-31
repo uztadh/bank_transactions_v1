@@ -1,11 +1,19 @@
 const db = require("./db");
 
-const ErrInsufficientFunds = new Error("Insufficient funds");
 const ErrInternalError = new Error("Internal error");
+
+const ErrInsufficientFunds = new Error("Insufficient funds");
 const ErrInvalidSender = new Error("Invalid Sender account number");
 const ErrInvalidReceiver = new Error("Invalid Receiver account number");
 const ErrDebounceReq = new Error("Repeated transfer");
 const ErrTestError = new Error("Sample generic error for dev only");
+const clientErrors = new Set([
+    ErrInsufficientFunds,
+    ErrInvalidSender,
+    ErrInvalidReceiver,
+    ErrDebounceReq,
+    ErrTestError
+]);
 
 const timer = ms =>
     new Promise(resolve => {
@@ -57,7 +65,8 @@ const dbTransfer = async (client, from, to, amount) => {
         };
     } catch (err) {
         await client.query("rollback");
-        throw err;
+        if (clientErrors.has(err)) throw err;
+        else throw ErrInternalError;
     }
 };
 const getCache = (timeoutMs = 1000) => {
