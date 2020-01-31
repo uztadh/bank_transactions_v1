@@ -1,0 +1,6 @@
+Add logging winston
+Folder structure (controllers, routes etc)
+use dotenv or config.json for pg connection
+add tests
+check best practices github advice
+Error handling in nodejs

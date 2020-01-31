@@ -1,0 +1,15 @@
+{
+    "name": "bank_transfer_v1",
+    "version": "1.0.0",
+    "description": "api for money transfer",
+    "main": "index.js",
+    "author": "naga",
+    "license": "MIT",
+    "private": true,
+    "dependencies": {
+        "pg": "^7.18.1"
+    },
+    "scripts": {
+        "start": "node src/app.js"
+    }
+}
