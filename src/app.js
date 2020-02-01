@@ -68,17 +68,6 @@ const runTransferSQL = ({ from, to, amount }) => async client => {
         throw err;
     }
 };
-const getCache = (timeoutMs = 1000) => {
-    let set = new Set();
-    const checkSert = key =>
-        new Promise((resolve, reject) => {
-            if (set.has(key)) return reject(ErrDebounceReq);
-            set.add(key);
-            setTimeout(() => set.delete(key), timeoutMs);
-            resolve();
-        });
-    return { checkSert };
-};
 
 const getTXKey = (from, to, amount) => `${from}!${to}!${amount}`;
 
@@ -87,13 +76,25 @@ const prTrace = label => val => {
     return Promise.resolve(val);
 };
 
+const getCache = () => {
+    let set = new Set();
+    const checkSert = key =>
+        new Promise((resolve, reject) => {
+            if (set.has(key)) return reject(ErrDebounceReq);
+            set.add(key);
+            setTimeout(() => set.delete(key), expire);
+            resolve();
+        });
+    return { checkSert };
+};
+
 const debounceTx = (cache => ({ from, to, amount }) => {
     const txKey = getTXKey(from, to, amount);
-    return cache.checkSert(txKey);
+    const timeoutMs = 5000;
+    return cache.checkSert(txKey, timeoutMs);
 })(getCache());
 
 const handleTxError = err => {
-    //log error
     let errMessage = err.isClientError ? err.message : "Internal error";
     return Promise.resolve({ error: errMessage });
 };
@@ -117,7 +118,7 @@ const handleTransfer = details => {
 const main = async () => {
     let res = await Promise.all(
         Array(3)
-            .fill([{ from: 1, to: 1, amount: 10 }])
+            .fill([{ from: 2, to: 1, amount: 1 }])
             .map(args => handleTransfer(...args))
     );
     console.log(res);
