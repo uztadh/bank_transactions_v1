@@ -15,6 +15,11 @@ const timer = ms =>
         setTimeout(resolve, ms);
     });
 
+const prTrace = label => val => {
+    console.log(`${label}: ${val}`);
+    return Promise.resolve(val);
+};
+
 //either resolves to id of transfer if successful or errors out
 const runTransferSQL = ({ from, to, amount }) => async client => {
     if (from === to) throw ErrInvalidReceiver;
@@ -69,16 +74,9 @@ const runTransferSQL = ({ from, to, amount }) => async client => {
     }
 };
 
-const getTXKey = (from, to, amount) => `${from}!${to}!${amount}`;
-
-const prTrace = label => val => {
-    console.log(`${label}: ${val}`);
-    return Promise.resolve(val);
-};
-
 const getCache = () => {
     let set = new Set();
-    const checkSert = key =>
+    const checkSert = (key, expire) =>
         new Promise((resolve, reject) => {
             if (set.has(key)) return reject(ErrDebounceReq);
             set.add(key);
@@ -88,13 +86,16 @@ const getCache = () => {
     return { checkSert };
 };
 
+const getTXKey = (from, to, amount) => `${from}!${to}!${amount}`;
+
 const debounceTx = (cache => ({ from, to, amount }) => {
     const txKey = getTXKey(from, to, amount);
-    const timeoutMs = 5000;
-    return cache.checkSert(txKey, timeoutMs);
+    const expire = 5000;
+    return cache.checkSert(txKey, expire);
 })(getCache());
 
 const handleTxError = err => {
+    if (!err.isClientError) console.error(err);
     let errMessage = err.isClientError ? err.message : "Internal error";
     return Promise.resolve({ error: errMessage });
 };
