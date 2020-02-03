@@ -1,8 +1,8 @@
-const { clientErrs } = require("./transferErrors");
+const { transferErrors } = require("./transferErrors");
 
 //either resolves to id of transfer if successful or errors out
 const insertTransfer = ({ from, to, amount }) => async client => {
-    if (from === to) throw clientErrs.InvalidReceiver;
+    if (from === to) throw transferErrors.InvalidReceiver;
     const payload = {
         from: { id: from },
         to: { id: to },
@@ -17,9 +17,9 @@ const insertTransfer = ({ from, to, amount }) => async client => {
             where account_nr = $1 for update`,
             [from]
         );
-        if (!resSenderCheck.rows[0]) throw clientErrs.InvalidSender;
+        if (!resSenderCheck.rows[0]) throw transferErrors.InvalidSender;
         if (resSenderCheck.rows[0].balance < amount)
-            throw clientErrs.InsufficientFunds;
+            throw transferErrors.InsufficientFunds;
 
         //deduct from sender's account
         const resUpdateSender = await client.query(
@@ -36,7 +36,7 @@ const insertTransfer = ({ from, to, amount }) => async client => {
             where account_nr = $2 returning account_nr`,
             [amount, to]
         );
-        if (!resUpdateReceiver.rows[0]) throw clientErrs.InvalidReceiver;
+        if (!resUpdateReceiver.rows[0]) throw transferErrors.InvalidReceiver;
 
         //record transaction
         const resInsertTx = await client.query(

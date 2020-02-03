@@ -3,4 +3,9 @@ const handleError = async err => {
     // await logger.logError(err);
 };
 
-module.exports = { handleError };
+const markAsOperationalError = err => {
+    err.isOperationalError = true;
+    return err;
+};
+
+module.exports = { handleError, markAsOperationalError };

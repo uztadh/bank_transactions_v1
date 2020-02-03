@@ -1,4 +1,4 @@
-const { clientErrs } = require("./transferErrors");
+const { transferErrors } = require("./transferErrors");
 
 const timer = ms =>
     new Promise(resolve => {
@@ -14,7 +14,7 @@ const getCache = () => {
     let set = new Set();
     const checkSert = (key, expire) =>
         new Promise((resolve, reject) => {
-            if (set.has(key)) return reject(clientErrs.DebounceReq);
+            if (set.has(key)) return reject(transferErrors.DebounceRequest);
             set.add(key);
             setTimeout(() => set.delete(key), expire);
             resolve();

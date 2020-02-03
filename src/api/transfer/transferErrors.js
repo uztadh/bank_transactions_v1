@@ -1,35 +1,30 @@
-const clientErr = err => {
-    err.isUserError = true;
-    err.userErrorCode = err.message;
-    return err;
-};
+const { markAsOperationalError } = require("../../lib/errors");
 
-/*
-function UserError(errorCode) {
+function TransferError(transferErrCode) {
     Error.call(this);
-    if (!userErrorCodes.has(errorCode) ) errorCode = userErrorCodes.
-    this.code = errorCode;
-    this.isUserError = true;
+    //Error.captureStackTrace(this);
+    this.isTransferErr = true;
+    this.transferErrCode = transferErrCode;
 }
-UserError.prototype = Object.create(Error.prototype);
-UserError.prototype.constructor = UserError;
+TransferError.prototype = Object.create(Error.prototype);
+TransferError.prototype.constructor = TransferError;
 
-const userErrorCodes = new Map({
-    insufficientFunds: "Insufficient_Funds",
-    invalidSender: "Invalid_Sender",
-    invalidReceiver: "Invalid_Receiver",
-    debounceRequest: "Debounce_Request"
-})
-*/
+const transferErrCodes = [
+    "InsufficientFunds",
+    "InvalidSender",
+    "InvalidReceiver",
+    "DebounceRequest"
+];
+const transferErrors = Object.freeze(
+    transferErrCodes.reduce(
+        (acc, errCode) => ({
+            ...acc,
+            [errCode]: markAsOperationalError(new TransferError(errCode))
+        }),
+        Object.create(null)
+    )
+);
 
-const InsufficientFunds = clientErr(new Error("Insufficient_Funds"));
-const InvalidSender = clientErr(new Error("Invalid_Sender"));
-const InvalidReceiver = clientErr(new Error("Invalid_Receiver"));
-const DebounceReq = clientErr(new Error("Debounce_Request"));
-
-module.exports.clientErrs = {
-    InsufficientFunds,
-    InvalidSender,
-    InvalidReceiver,
-    DebounceReq
+module.exports = {
+    transferErrors
 };

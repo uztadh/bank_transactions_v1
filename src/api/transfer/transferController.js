@@ -12,9 +12,9 @@ const handleTransfer = (() => {
                 .finally(() => client.release());
         });
 
-    const handleErr = err => {
-        if (!err.isClientError) console.error(err);
-        let error = err.isUserError ? err.userErrorCode : "Internal_Error";
+    const handleTransferErr = err => {
+        if (!err.isTransferErr) console.error(err);
+        let error = err.isTransferErr ? err.transferErrCode : "InternalError";
         return Promise.resolve({ error });
     };
 
@@ -22,7 +22,7 @@ const handleTransfer = (() => {
         debounceTx(details)
             .then(db.getClient)
             .then(checkDBClientErrs(insertTransfer(details)))
-            .catch(handleErr);
+            .catch(handleTransferErr);
 })();
 
 module.exports = { handleTransfer };
