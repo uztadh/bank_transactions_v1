@@ -11,7 +11,6 @@ api.post(
     "/transfer",
     asyncRouteWrapper(async ({ body: tranferDetails } = {}, res) => {
         const resObj = await transferControllers.handleTransfer(tranferDetails);
-        if (resObj.error) res.status(400);
         res.json(resObj);
     })
 );

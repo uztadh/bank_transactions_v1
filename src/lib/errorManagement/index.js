@@ -1,4 +1,8 @@
+// if is operational error, logs,
+// else, logs and throws
 const handleError = async err => {
+    if (err.isOperationalError) console.error("is operational error");
+    else console.error("is NOT operational error");
     console.error(err);
     // await logger.logError(err);
 };
@@ -14,4 +18,6 @@ const markAsOperationalError = err => {
     return err;
 };
 
-module.exports = { handleError, markAsOperationalError };
+const isUntrustedError = err => !err.isOperationalError;
+
+module.exports = { handleError, markAsOperationalError, isUntrustedError };

@@ -1,7 +1,8 @@
 const { transferErrors } = require("./transferErrors");
 
 //either resolves to id of transfer if successful or errors out
-const insertTransfer = ({ from, to, amount } = {}) => async client => {
+// caller should ensure from, to, amount are non null, non undefined
+const insertTransfer = ({ from, to, amount }) => async client => {
     if (from === to) throw transferErrors.InvalidReceiver;
 
     const payload = {

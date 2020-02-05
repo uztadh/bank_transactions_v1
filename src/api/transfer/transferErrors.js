@@ -1,4 +1,4 @@
-const { markAsOperationalError } = require("../../lib/errors");
+const { markAsOperationalError } = require("../../lib/errorManagement");
 
 function TransferError(transferErrCode) {
     Error.call(this);

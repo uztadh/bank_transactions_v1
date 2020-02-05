@@ -12,10 +12,13 @@ const handleTransfer = (() => {
                 .finally(() => client.release());
         });
 
+    //on errors resulting from transfer details eg insufficient balance
+    //users are informed, otherwise, the error is thrown and either
+    //handled by middleware or centrally
     const handleTransferErr = err => {
-        if (!err.isTransferErr) console.error(err);
-        let error = err.isTransferErr ? err.transferErrCode : "InternalError";
-        return Promise.resolve({ error });
+        if (err.isTransferErr)
+            return Promise.resolve({ transfer_error: err.transferErrCode });
+        else throw err;
     };
 
     return details =>
