@@ -5,6 +5,7 @@ const timer = ms =>
         setTimeout(resolve, ms);
     });
 
+//for debugging
 const prTrace = label => val => {
     console.log(`${label}: ${val}`);
     return Promise.resolve(val);
@@ -30,4 +31,4 @@ const debounceTx = (cache => transferDetails => {
     return cache.checkSert(txKey, expire);
 })(getCache());
 
-module.exports = { debounceTx };
+module.exports = { debounceTx, prTrace };

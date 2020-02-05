@@ -9,12 +9,8 @@ api.use(express.json());
 
 api.post(
     "/transfer",
-    asyncRouteWrapper(async (req, res) => {
-        const resObj = await transferControllers.handleTransfer({
-            from: req.from,
-            to: req.to,
-            amount: req.amount
-        });
+    asyncRouteWrapper(async ({ body: tranferDetails } = {}, res) => {
+        const resObj = await transferControllers.handleTransfer(tranferDetails);
         if (resObj.error) res.status(400);
         res.json(resObj);
     })

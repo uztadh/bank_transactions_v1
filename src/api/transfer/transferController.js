@@ -1,5 +1,5 @@
 const db = require("../../lib/db");
-const { debounceTx } = require("./transferUtils");
+const { debounceTx, prTrace } = require("./transferUtils");
 const { insertTransfer } = require("./transferDAL");
 
 const handleTransfer = (() => {
