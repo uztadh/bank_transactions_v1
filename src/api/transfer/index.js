@@ -1,3 +1,3 @@
 module.exports = {
-    transferController: { ...require("./transferController") }
+    transferControllers: { ...require("./transferController") }
 };
