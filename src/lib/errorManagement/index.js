@@ -1,9 +1,9 @@
 // if is operational error, logs,
 // else, logs and throws
 const handleError = async err => {
-    if (err.isOperationalError) console.error("is operational error");
-    else console.error("is NOT operational error");
-    console.error(err);
+    // if (err.isOperationalError) console.error("is operational error");
+    // else console.error("is NOT operational error");
+    // console.error(err);
     // await logger.logError(err);
 };
 

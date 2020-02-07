@@ -17,7 +17,7 @@ const handleTransfer = (() => {
     //handled by middleware or centrally
     const handleTransferErr = err => {
         if (err.isTransferErr)
-            return Promise.resolve({ transfer_error: err.transferErrCode });
+            return Promise.resolve({ transferError: err.transferErrCode });
         else throw err;
     };
 

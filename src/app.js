@@ -1,11 +1,28 @@
 const express = require("express");
-const logger = require("morgan");
 const { api: apiRouter } = require("./api");
+const { loggerMiddleware } = require("./lib/logger");
 const errorManagement = require("./lib/errorManagement");
 
 const app = express();
 
-app.use(logger("short"));
+app.use(loggerMiddleware);
+
+/*
+app.use(function(req, res, next) {
+    const afterResponse = () => {
+        console.log(res.status());
+        res.removeListener("finish", afterResponse);
+        res.removeListener("close", afterResponse);
+        // action after response
+    };
+
+    res.on("finish", afterResponse);
+    res.on("close", afterResponse);
+
+    // action before request
+    // eventually calling `next()`
+    next();
+});*/
 
 app.use(apiRouter);
 

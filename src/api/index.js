@@ -9,8 +9,11 @@ api.use(express.json());
 
 api.post(
     "/transfer",
-    asyncRouteWrapper(async ({ body: tranferDetails } = {}, res) => {
-        const resObj = await transferControllers.handleTransfer(tranferDetails);
+    asyncRouteWrapper(async (req, res) => {
+        const transferDetails = req.body;
+        const resObj = await transferControllers.handleTransfer(
+            transferDetails
+        );
         res.json(resObj);
     })
 );
