@@ -5,7 +5,7 @@ const cuid = require("cuid");
 const { getReqResDetails } = require("./utils");
 
 let logger = pino({
-    prettyPrint: !true,
+    prettyPrint: true,
     mixin() {
         const ns = cls.getNamespace("app");
         return { traceID: ns.get("traceID") };
@@ -37,7 +37,7 @@ let loggerMiddleware = (req, res, next) => {
         res.removeListener("close", afterResponse);
         const log = {
             timeReqReceived: start,
-            ...getReqResDetails(req, res),
+            //...getReqResDetails(req, res),
             responseTime: Date.now() - start
         };
         logger.info(log);

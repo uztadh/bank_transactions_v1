@@ -1,4 +1,5 @@
 const { transferErrors } = require("./transferErrors");
+const { logger } = require("../../lib/logger");
 
 const timer = ms =>
     new Promise(resolve => {
@@ -7,7 +8,7 @@ const timer = ms =>
 
 //for debugging
 const prTrace = label => val => {
-    console.log(`${label}: ${val}`);
+    logger.debug(`${label}: ${val}`);
     return Promise.resolve(val);
 };
 
@@ -25,10 +26,10 @@ const getCache = () => {
 
 const getTxKey = ({ from, to, amount }) => `${from}!${to}!${amount}`;
 
-const debounceTx = (cache => transferDetails => {
+const debounceTx = (cache => (transferDetails = {}) => {
     const txKey = getTxKey(transferDetails);
     const expire = 5000;
-    return cache.checkSert(txKey, expire);
+    return cache.checkSert(txKey, expire).then(() => transferDetails);
 })(getCache());
 
 module.exports = { debounceTx, prTrace };

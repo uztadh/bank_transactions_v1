@@ -13,7 +13,8 @@ const transferErrCodes = [
     "InsufficientFunds",
     "InvalidSender",
     "InvalidReceiver",
-    "DebounceRequest"
+    "DebounceRequest",
+    "InvalidDetails"
 ];
 const transferErrors = Object.freeze(
     transferErrCodes.reduce(

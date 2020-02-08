@@ -2,9 +2,8 @@ const { transferErrors } = require("./transferErrors");
 const { logger } = require("../../lib/logger");
 
 //either resolves to id of transfer if successful or errors out
-// caller should ensure from, to, amount are non null, non undefined
+// caller should ensure from, to, amount are non null, non undefined ie validate
 const insertTransfer = ({ from, to, amount }) => async client => {
-    if (from === to) throw transferErrors.InvalidReceiver;
     const payload = {
         from: { id: from },
         to: { id: to },
