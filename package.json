@@ -8,10 +8,10 @@
     "private": true,
     "dependencies": {
         "@hapi/joi": "^17.1.0",
-        "add": "^2.0.6",
         "cls-hooked": "^4.2.2",
         "cuid": "^2.1.8",
         "express": "^4.17.1",
+        "forever": "^2.0.0",
         "nodemon": "^2.0.2",
         "pg": "^7.18.1",
         "pino": "^5.16.0",
@@ -19,6 +19,7 @@
         "yarn": "^1.22.0"
     },
     "scripts": {
-        "start": "nodemon src/bin/www/server.js"
+        "start": "forever --minUptime 5000 --spinSleepTime 5000 src/bin/www/server.js",
+        "dev": "nodemon src/bin/www/server.js"
     }
 }

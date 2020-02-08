@@ -3,7 +3,7 @@ const { app } = require("../../app");
 const { logger } = require("../../lib/logger");
 const errorManagement = require("../../lib/errorManagement");
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 app.set("port", port);
 
 http.createServer(app).listen(app.get("port"), () => {

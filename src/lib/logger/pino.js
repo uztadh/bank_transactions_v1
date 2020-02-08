@@ -4,15 +4,17 @@ const cls = require("cls-hooked");
 const cuid = require("cuid");
 const { getReqResDetails } = require("./utils");
 
+const isNotProductionEnv = process.env.NODE_ENV !== "production";
+
 let logger = pino({
-    prettyPrint: true,
+    prettyPrint: isNotProductionEnv === true,
     mixin() {
         const ns = cls.getNamespace("app");
         return { traceID: ns.get("traceID") };
     }
 });
 
-if (process.env.NODE_ENV !== "production") {
+if (isNotProductionEnv) {
     logger.level = "debug";
 }
 
@@ -37,7 +39,7 @@ let loggerMiddleware = (req, res, next) => {
         res.removeListener("close", afterResponse);
         const log = {
             timeReqReceived: start,
-            //...getReqResDetails(req, res),
+            ...getReqResDetails(req, res),
             responseTime: Date.now() - start
         };
         logger.info(log);

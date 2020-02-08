@@ -5,16 +5,19 @@ const errorManagement = require("./lib/errorManagement");
 
 const app = express();
 
+app.disable("x-powered-by");
+
 app.use(traceMiddleware);
 app.use(loggerMiddleware);
 app.use(apiRouter);
+
+//404 handler
 app.use((req, res) => {
     res.sendStatus(404);
 });
 
+//err handler
 app.use(async (err, req, res, next) => {
-    // first send response, then delegate error handling
-    //to centralized error handling
     res.sendStatus(500);
     errorManagement.handleError(err);
 });
