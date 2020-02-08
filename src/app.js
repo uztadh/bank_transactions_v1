@@ -9,15 +9,13 @@ app.use(traceMiddleware);
 app.use(loggerMiddleware);
 app.use(apiRouter);
 app.use((req, res) => {
-    res.status(404);
-    res.send("Not Found");
+    res.sendStatus(404);
 });
 
 app.use(async (err, req, res, next) => {
     // first send response, then delegate error handling
     //to centralized error handling
-    res.status(500);
-    res.send("Error");
+    res.sendStatus(500);
     errorManagement.handleError(err);
 });
 
