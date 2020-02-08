@@ -1,8 +1,7 @@
 const db = require("../../lib/db");
-const { debounceTx } = require("./transferUtils");
+const { debounceTx, logger } = require("./transferUtils");
 const { insertTransfer } = require("./transferDAL");
 const { validate } = require("./transferDetailsValidator");
-const { logger } = require("../../lib/logger");
 
 const handleTransfer = (() => {
     const checkDBClientErrs = runSQL => client =>

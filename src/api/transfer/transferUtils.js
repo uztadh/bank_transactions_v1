@@ -32,4 +32,4 @@ const debounceTx = (cache => (transferDetails = {}) => {
     return cache.checkSert(txKey, expire).then(() => transferDetails);
 })(getCache());
 
-module.exports = { debounceTx, prTrace };
+module.exports = { debounceTx, prTrace, logger };

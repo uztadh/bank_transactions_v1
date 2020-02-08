@@ -1,6 +1,5 @@
 const Joi = require("@hapi/joi");
 const { transferErrors } = require("./transferErrors");
-const { logger } = require("../../lib/logger");
 
 const accountNumSchema = Joi.number()
     .min(1)

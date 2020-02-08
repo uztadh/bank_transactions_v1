@@ -1,5 +1,5 @@
 const { transferErrors } = require("./transferErrors");
-const { logger } = require("../../lib/logger");
+const { logger } = require("./transferUtils");
 
 //either resolves to id of transfer if successful or errors out
 // caller should ensure from, to, amount are non null, non undefined ie validate
