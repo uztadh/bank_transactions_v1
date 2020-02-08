@@ -1,11 +1,6 @@
-// if is operational error, logs,
-// else, logs and throws
-const handleError = async err => {
-    // if (err.isOperationalError) console.error("is operational error");
-    // else console.error("is NOT operational error");
-    // console.error(err);
-    // await logger.logError(err);
-};
+const { logger } = require("../logger");
+
+const handleError = err => logger.error(err);
 
 /*
 operational errors, marked as so, are 'trusted errors'

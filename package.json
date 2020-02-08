@@ -7,14 +7,12 @@
     "license": "MIT",
     "private": true,
     "dependencies": {
+        "cls-hooked": "^4.2.2",
+        "cuid": "^2.1.8",
         "express": "^4.17.1",
-        "express-pino-logger": "^4.0.0",
-        "morgan": "^1.9.1",
         "nodemon": "^2.0.2",
         "pg": "^7.18.1",
-        "pino": "^5.16.0",
-        "pino-pretty": "^3.5.0",
-        "winston": "^3.2.1"
+        "pino": "^5.16.0"
     },
     "scripts": {
         "start": "nodemon src/bin/www/server.js"

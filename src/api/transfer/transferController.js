@@ -1,6 +1,7 @@
 const db = require("../../lib/db");
-const { debounceTx, prTrace } = require("./transferUtils");
+const { debounceTx } = require("./transferUtils");
 const { insertTransfer } = require("./transferDAL");
+const { logger } = require("../../lib/logger");
 
 const handleTransfer = (() => {
     const checkDBClientErrs = runSQL => client =>
@@ -16,9 +17,9 @@ const handleTransfer = (() => {
     //users are informed, otherwise, the error is thrown and either
     //handled by middleware or centrally
     const handleTransferErr = err => {
-        if (err.isTransferErr)
-            return Promise.resolve({ transferError: err.transferErrCode });
-        else throw err;
+        if (!err.isTransferErr) throw err;
+        logger.info({ transferError: err.transferErrCode });
+        return Promise.resolve({ transferError: err.transferErrCode });
     };
 
     return details =>
