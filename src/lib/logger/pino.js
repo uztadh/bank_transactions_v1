@@ -51,4 +51,9 @@ let loggerMiddleware = (req, res, next) => {
     next();
 };
 
-module.exports = { logger, loggerMiddleware, traceMiddleware };
+module.exports = {
+    logger,
+    loggerMiddleware,
+    traceMiddleware,
+    getReqResDetails
+};

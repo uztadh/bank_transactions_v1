@@ -1,4 +1,5 @@
 const express = require("express");
+const rateLimit = require("express-rate-limit");
 const { api: apiRouter } = require("./api");
 const { loggerMiddleware, traceMiddleware } = require("./lib/logger");
 const errorManagement = require("./lib/errorManagement");
@@ -6,6 +7,15 @@ const errorManagement = require("./lib/errorManagement");
 const app = express();
 
 app.disable("x-powered-by");
+
+// app.set('trust proxy', 1);
+app.use(
+    rateLimit({
+        windowMs: 10 * 60 * 1000, // 10 min
+        max: 100,
+        headers: false
+    })
+);
 
 app.use(traceMiddleware);
 app.use(loggerMiddleware);
