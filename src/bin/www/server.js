@@ -1,9 +1,10 @@
+require("dotenv").config();
 const http = require("http");
 const { app } = require("../../app");
 const { logger } = require("../../lib/logger");
 const errorManagement = require("../../lib/errorManagement");
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 app.set("port", port);
 
 http.createServer(app).listen(app.get("port"), () => {

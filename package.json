@@ -10,6 +10,7 @@
         "@hapi/joi": "^17.1.0",
         "cls-hooked": "^4.2.2",
         "cuid": "^2.1.8",
+        "dotenv": "^8.2.0",
         "express": "^4.17.1",
         "express-rate-limit": "^5.0.0",
         "forever": "^2.0.0",
@@ -20,6 +21,7 @@
     },
     "scripts": {
         "start": "forever --minUptime 5000 --spinSleepTime 5000 src/bin/www/server.js",
-        "dev": "nodemon src/bin/www/server.js"
+        "dev": "nodemon src/bin/www/server.js",
+        "foo": "node ./src/lib/config/foo.js"
     }
 }
