@@ -24,8 +24,8 @@ const handleTransfer = (() => {
     };
 
     return details =>
-        debounceTx(details)
-            .then(validate)
+        validate(details)
+            .then(debounceTx)
             .then(db.getClient)
             .then(checkDBClientErrs(insertTransfer(details)))
             .catch(handleTransferErr);

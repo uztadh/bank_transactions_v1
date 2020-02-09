@@ -9,7 +9,7 @@ const asyncRouteWrapper = routerFn => (req, res, next) =>
 const parseJSONMiddleware = (() => {
     const parseJSON = express.json({
         strict: true,
-        limit: "1kb"
+        limit: "200b"
     });
     return (req, res, next) =>
         parseJSON(req, res, err => (err ? res.sendStatus(400) : next()));
@@ -21,10 +21,11 @@ api.post(
     "/transfer",
     asyncRouteWrapper(async (req, res) => {
         const transferDetails = req.body;
-        const resObj = await transferControllers.handleTransfer(
+        const result = await transferControllers.handleTransfer(
             transferDetails
         );
-        res.json(resObj);
+        if (result.transferError) res.status(400);
+        res.json(result);
     })
 );
 
