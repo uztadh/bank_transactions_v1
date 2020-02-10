@@ -307,7 +307,3 @@ details =>
    PGPORT=...
    PGDATABASE=...
    ```
-
-
-
-Assign ‘TransactionId’ to each log statement: https://github.com/goldbergyoni/nodebestpractices/blob/master/sections/production/assigntransactionid.md
